@@ -127,7 +127,8 @@ DisplacedHcalJetNTuplizer::DisplacedHcalJetNTuplizer(const edm::ParameterSet& iC
 	Flag_hfNoisyHitsFilterToken_(mayConsume<edm::HLTPathStatus>(iConfig.getParameter<edm::InputTag>("Flag_hfNoisyHitsFilter"))),
 	Flag_trkPOG_manystripclus53XToken_(mayConsume<edm::HLTPathStatus>(iConfig.getParameter<edm::InputTag>("Flag_trkPOG_manystripclus53X"))),
 	Flag_trkPOG_toomanystripclus53XToken_(mayConsume<edm::HLTPathStatus>(iConfig.getParameter<edm::InputTag>("Flag_trkPOG_toomanystripclus53X"))),
-	Flag_trkPOG_logErrorTooManyClustersToken_(mayConsume<edm::HLTPathStatus>(iConfig.getParameter<edm::InputTag>("Flag_trkPOG_logErrorTooManyClusters")))
+	Flag_trkPOG_logErrorTooManyClustersToken_(mayConsume<edm::HLTPathStatus>(iConfig.getParameter<edm::InputTag>("Flag_trkPOG_logErrorTooManyClusters"))),
+	l1GtUtils_(iConfig, consumesCollector(), *this, l1t::UseEventSetupIn::Event)
 	{
 
 	cout<<"Option Settings:"<<endl;
@@ -317,6 +318,15 @@ DisplacedHcalJetNTuplizer::DisplacedHcalJetNTuplizer(const edm::ParameterSet& iC
 	triggerPathNames.push_back("HLT_Mu6HT240_DisplacedDijet50_Inclusive0PtrkShortSig5");
 	triggerPathNames.push_back("HLT_PFJet200_TimeGt2p5ns");
 	triggerPathNames.push_back("HLT_PFJet200_TimeLtNeg2p5ns");
+
+	// ----- L1 Trigger Names ----- //
+	// l1TriggerPrescalesMC: luminosity-weighted effective prescales to use for MC
+	// (MC always reports prescale=1; these correct for the data prescale rates)
+	l1TriggerNames.push_back("L1_HTT120_SingleLLPJet40");  l1TriggerPrescalesMC.push_back(100);
+	l1TriggerNames.push_back("L1_HTT160_SingleLLPJet50");  l1TriggerPrescalesMC.push_back(50);
+	l1TriggerNames.push_back("L1_HTT200_SingleLLPJet60");  l1TriggerPrescalesMC.push_back(1);
+	l1TriggerNames.push_back("L1_HTT240_SingleLLPJet70");  l1TriggerPrescalesMC.push_back(1);
+	l1TriggerNames.push_back("L1_DoubleLLPJet40");         l1TriggerPrescalesMC.push_back(1);
 
 		/*
 	ifstream myfile (edm::FileInPath(triggerPathNamesFile_.c_str()).fullPath().c_str()) ;
@@ -512,6 +522,8 @@ void DisplacedHcalJetNTuplizer::EnableTriggerBranches(){
 	output_tree->Branch("HLT_Prescale", &HLT_Prescale);
 	output_tree->Branch("HLT_SF_L1", &HLT_SF_L1);
 	output_tree->Branch("HLT_SF_Tot", &HLT_SF_Tot);
+	output_tree->Branch("L1_Decision", &L1_Decision);
+	output_tree->Branch("L1_Prescale", &L1_Prescale);
 
 };
 
@@ -1104,6 +1116,8 @@ void DisplacedHcalJetNTuplizer::ResetTriggerBranches(){
 	HLT_Prescale.clear();
 	HLT_SF_L1.clear();
 	HLT_SF_Tot.clear();
+	L1_Decision.clear();
+	L1_Prescale.clear();
 
 };
 
@@ -1725,7 +1739,7 @@ void DisplacedHcalJetNTuplizer::analyze(const edm::Event& iEvent, const edm::Eve
 	FillJetBranches( iEvent, iSetup );
 
 	// Low-Level Objects
-	FillTriggerBranches( iEvent );
+	FillTriggerBranches( iEvent, iSetup );
 	FillTrackBranches( iEvent ); //, iSetup );
 	//FillPFCandidateBranches( iEvent, iSetup );
 	//FillSecondaryVerticesBranches( iEvent, iSetup );
@@ -1831,7 +1845,7 @@ bool DisplacedHcalJetNTuplizer::FillPVBranches( const edm::Event& iEvent ){
 
 
 // ------------------------------------------------------------------------------------
-bool DisplacedHcalJetNTuplizer::FillTriggerBranches(const edm::Event& iEvent){
+bool DisplacedHcalJetNTuplizer::FillTriggerBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
 	if( debug ) cout<<"Running DisplacedHcalJetNTuplizer::FillTriggerBranches"<<endl; 
 
@@ -1917,7 +1931,25 @@ bool DisplacedHcalJetNTuplizer::FillTriggerBranches(const edm::Event& iEvent){
 
 	}
 
-	if( debug ) cout<<"Done DisplacedHcalJetNTuplizer::FillTriggerBranches"<<endl; 
+	// ----- L1 Trigger Decisions ----- //
+
+	l1GtUtils_.retrieveL1(iEvent, iSetup);
+	for( size_t i = 0; i < l1TriggerNames.size(); ++i ){
+		const string& l1Name = l1TriggerNames[i];
+		bool l1dec = false;
+		double l1pre = 0.0;
+		l1GtUtils_.getInitialDecisionByName(l1Name, l1dec);
+		if( isData_ ){
+			l1GtUtils_.getPrescaleByName(l1Name, l1pre);
+		} else {
+			l1pre = l1TriggerPrescalesMC[i];
+		}
+		if( debug ) cout<<"  L1 "<<l1Name<<" : "<<l1dec<<" (prescale "<<l1pre<<")"<<endl;
+		L1_Decision.push_back( l1dec );
+		L1_Prescale.push_back( l1pre );
+	}
+
+	if( debug ) cout<<"Done DisplacedHcalJetNTuplizer::FillTriggerBranches"<<endl;
 
 	return true;
 };
