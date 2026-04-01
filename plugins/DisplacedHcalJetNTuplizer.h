@@ -87,6 +87,8 @@ using namespace std;
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/L1Trigger/interface/BXVector.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
+#include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
+#include "L1Trigger/L1TGlobal/interface/L1TGlobalUtil.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
@@ -250,7 +252,7 @@ public:
 	// Event Level Info
 	bool FillEventInfoBranches( const edm::Event& iEvent );
 	bool FillPVBranches( const edm::Event& iEvent );
-	bool FillTriggerBranches( const edm::Event& iEvent );
+	bool FillTriggerBranches( const edm::Event& iEvent, const edm::EventSetup& iSetup );
 	bool FillMetBranches( const edm::Event& iEvent );
 	// Standard Objects
 	bool FillElectronBranches( const edm::Event& iEvent );
@@ -420,6 +422,11 @@ protected:
 	// Mapping of the HLT Triggers and Filters
 	vector<string> triggerPathNames;
 	map<string, int> triggerPathNamesIndices;
+
+	// L1 trigger names and utility
+	l1t::L1TGlobalUtil l1GtUtils_;
+	vector<string> l1TriggerNames;
+	vector<double> l1TriggerPrescalesMC; // effective prescales for MC
 	//vector<string> eleHLTFilterNames;
 	//vector<string> muonHLTFilterNames;
 	//vector<string> phoHLTFilterNames;
@@ -562,6 +569,9 @@ protected:
 	vector<int> HLT_Prescale; //[NTriggersMAX];
 	vector<double> HLT_SF_Tot; //[NTriggersMAX];
 	vector<double> HLT_SF_L1; //[NTriggersMAX];
+
+	vector<bool> L1_Decision;
+	vector<double> L1_Prescale;
 
 	//pdf weight helper
 	//RazorPDFWeightsHelper pdfweightshelper;

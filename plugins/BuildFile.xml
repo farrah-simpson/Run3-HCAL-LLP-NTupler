@@ -25,5 +25,7 @@
 <use name="MagneticField/Records"/>
 <use name="MagneticField/Engine"/>
 <use name="cms_lpc_llp/Run3-HCAL-LLP-NTupler"/>
+<use name="L1Trigger/L1TGlobal"/>
+<use name="DataFormats/L1TGlobal"/>
 <use name="correctionlib"/>
 <flags EDM_PLUGIN="1"/>
