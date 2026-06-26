@@ -140,6 +140,9 @@ else:
         ("HToSSTo4B", "2022_"):          ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC", "2022_Summer22"),
         # ("HToSSTo4B", "2023BPixPrompt"): "Summer23BPixPrompt23_V3_MC",
         # ("WJetsToLNu", "preEE"):         ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC"),
+        ("HTo2LongLivedTo4b", "22DRPremix"): ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC", "2022_Summer22"),
+        ("HTo2LongLivedTo4b", "22EEDR"):     ("Summer22EE_22Sep2023_V3_MC", "Summer22EE_22Sep2023_JRV1_MC", "2022_Summer22EE"),
+        ("HTo2LongLivedTo4b", "23BPix"):     ("Summer23BPixPrompt23_V3_MC", "Summer23BPixPrompt23_RunD_JRV1_MC", "2023_Summer23BPix"),
     }
 
 tag_name         = None
@@ -160,6 +163,7 @@ for (run, reco), (name, JERname, BTAGname) in mapping.items():
         BTag_SF_tag_name = BTAGname
         era_name         = run + "_" + reco
         break
+
 if tag_name is None:
     raise RuntimeError("No matching JEC tag found for input file " + inputFiles[0])
 if JER_tag_name is None:
@@ -174,6 +178,14 @@ else:
     elif "2023Prompt_" in era_name: era_name = "2023preBPix"
     elif "2022EE" in era_name:      era_name = "2022postEE"
     elif "2022_" in era_name:       era_name = "2022preEE"
+    elif "22DRPremix" in era_name:       era_name = "2022preEE"
+    elif "22EEDR" in era_name:      era_name = "2022postEE"
+
+if options.debug:
+    print( tag_name         ) 
+    print( JER_tag_name     ) 
+    print( BTag_SF_tag_name ) 
+    print( era_name         ) 
 
 # ---------------------------------------------------------------------------------------
 # SET UP PROCESS
@@ -182,8 +194,6 @@ else:
 #process = cms.Process('RECO',Run3_2023) #TODOFIX
 
 process = cms.Process('DisplacedHcalJetNTuplizer',Run3) #TODOFIX
-
-#if recoFromRAW:
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -259,7 +269,7 @@ process.options = cms.untracked.PSet(
     holdsReferencesToDeleteEarly = cms.untracked.VPSet(),
     makeTriggerResults = cms.obsolete.untracked.bool,
     modulesToIgnoreForDeleteEarly = cms.untracked.vstring(),
-    numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(0),
+    numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
     numberOfThreads = cms.untracked.uint32(1),
@@ -268,6 +278,8 @@ process.options = cms.untracked.PSet(
     throwIfIllegalParameter = cms.untracked.bool(True),
     wantSummary = cms.untracked.bool(False)
 )
+
+if options.recoFromRAW: process.options.numberOfThreads = cms.untracked.uint32(2)
 
 # Meta Data
 #process.configurationMetadata = cms.untracked.PSet(
@@ -292,6 +304,7 @@ global_tags_MC = {
     "2023preBPix":  "130X_mcRun3_2023_realistic_v14",
     "2023postBPix": "130X_mcRun3_2023_realistic_v14",
 }
+
 # 140X_dataRun3_v17
 
 if options.isData: 
@@ -310,6 +323,12 @@ process.hltFilter = cms.EDFilter("HLTHighLevel",
     andOr = cms.bool(True),
     throw = cms.bool(False)
 )
+
+if not options.isData:
+    process.hltFilter = cms.EDFilter("HLTBool",
+        result = cms.bool(True)
+    )
+
 
 # ----- Actual Reconstruction!!!! ----- #
 
@@ -499,6 +518,7 @@ process.patJets.userData.userInts.src = [ cms.InputTag("pileupJetId:fullId"), ]
 process.load('PhysicsTools.PatAlgos.recoLayer0.bTagging_cff')
 process.patJets.discriminatorSources = cms.VInputTag(
     #cms.InputTag('pfParticleTransformerAK4JetTags:probb'),# 'probb'),
+    #cms.InputTag("pfDeepFlavourJetTags:probb"),
     cms.InputTag("pfDeepCSVJetTags:probb"),
     cms.InputTag("pfDeepCSVJetTags:probc"),
     cms.InputTag("pfDeepCSVJetTags:probudsg"),
@@ -870,8 +890,8 @@ process.DisplacedHcalJets = cms.EDAnalyzer('DisplacedHcalJetNTuplizer',
 
 if not options.isData: 
     process.DisplacedHcalJets.jer_PtResolution = cms.FileInPath("cms_lpc_llp/Run3-HCAL-LLP-NTupler/data/JEC_JER/JRDatabase/textFiles/"+JER_tag_name+"/"+JER_tag_name+"_PtResolution_AK4PFPuppi.txt")
-    process.DisplacedHcalJets.jer_ScaleFactor = cms.FileInPath("cms_lpc_llp/Run3-HCAL-LLP-NTupler/data/JEC_JER/JRDatabase/textFiles/"+JER_tag_name+"/"+JER_tag_name+"_SF_AK4PFPuppi.txt")
-    process.DisplacedHcalJets.btagSysSF = cms.FileInPath("cms_lpc_llp/Run3-HCAL-LLP-NTupler/data/BTag/btv-scale-factors/"+BTag_SF_tag_name+"/json/btagging_v2.json")
+    process.DisplacedHcalJets.jer_ScaleFactor  = cms.FileInPath("cms_lpc_llp/Run3-HCAL-LLP-NTupler/data/JEC_JER/JRDatabase/textFiles/"+JER_tag_name+"/"+JER_tag_name+"_SF_AK4PFPuppi.txt")
+    process.DisplacedHcalJets.btagSysSF        = cms.FileInPath("cms_lpc_llp/Run3-HCAL-LLP-NTupler/data/BTag/btv-scale-factors/"+BTag_SF_tag_name+"/json/btagging_v2.json")
     # note that _AK4PFchs.txt is a symlink back to _AK4PFPuppi.txt, and there are issues when the symlinked version is used. So the puppi version is listed. 
     # based on https://cms-jerc.web.cern.ch/Recommendations/#2023_1
 # process.DisplacedHcalJets.jec_Uncertainty = cms.FileInPath("cms_lpc_llp/Run3-HCAL-LLP-NTupler/data/JEC_JER/JECDatabase/textFiles/"+tag_name+"/"+tag_name+"_Uncertainty_AK4PFPuppi.txt")
@@ -930,7 +950,7 @@ process.schedule = cms.Schedule( process.p )
 
 if options.recoFromRAW:
 
-    # Include HLT Filter to NTuplization Process
+    # Include HLT Filter to NTuplization Process (NB filter does nothing for MC)
     process.p = cms.Path( process.hltFilter * process.primaryVertexAssociationLocal * process.egmGsfElectronIDSequence * process.egmPhotonIDSequence * process.NjettinessAK8CHS * process.metFiltersRecommended * process.DisplacedHcalJets )
 
     # Schedule definition
