@@ -6,3 +6,6 @@ cmsRun ../python/DisplacedHcalJetNTuplizer.py isData=True isSignal=False process
 
 # Test Signal
 cmsRun ../python/DisplacedHcalJetNTuplizer.py isData=False isSignal=True processEvents=100 inputFiles=InputSignal_Run3_ggH_HToSSTobbbb_MH-125_MS-50_CTau3000_13p6TeV.txt debug=False outputFile=ntuple_output_test_signal.root
+
+# Test Signal (Reco from RAW)
+cmsRun ../python/DisplacedHcalJetNTuplizer.py isData=False isSignal=True processEvents=100 inputFiles=InputSignal_TestRaw.txt debug=False outputFile=ntuple_output_test_signal.root recoFromRAW=True
