@@ -19,14 +19,14 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing()
 
 options.register('isData',
-    True, # default value # isData wrapper
+    False, # default value # isData wrapper
     VarParsing.VarParsing.multiplicity.singleton,
     VarParsing.VarParsing.varType.bool,
     "is Data"
 )
 
 options.register('isSignal',
-    False, # default value # isSignal wrapper
+    True, # default value # isSignal wrapper
     VarParsing.VarParsing.multiplicity.singleton,
     VarParsing.VarParsing.varType.bool,
     "is Signal"
@@ -138,11 +138,16 @@ else:
         ("HToSSTo4B", "2023Prompt_"):    ("Summer23Prompt23_V3_MC", "Summer23Prompt23_RunCv1234_JRV1_MC", "2023_Summer23"), 
         ("HToSSTo4B", "2022EE"):         ("Summer22EE_22Sep2023_V3_MC", "Summer22EE_22Sep2023_JRV1_MC", "2022_Summer22EE"),
         ("HToSSTo4B", "2022_"):          ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC", "2022_Summer22"),
+        ("HTo2LongLivedTo4b", "postBPix"):("Summer23BPixPrompt23_V3_MC", "Summer23BPixPrompt23_RunD_JRV1_MC", "2023_Summer23BPix"),
+        ("HTo2LongLivedTo4b", "postEE"): ("Summer22EE_22Sep2023_V3_MC", "Summer22EE_22Sep2023_JRV1_MC", "2022_Summer22EE"),
+        ("HTo2LongLivedTo4b", "2022_"):  ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC", "2022_Summer22"),
         # ("HToSSTo4B", "2023BPixPrompt"): "Summer23BPixPrompt23_V3_MC",
         # ("WJetsToLNu", "preEE"):         ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC"),
         ("HTo2LongLivedTo4b", "22DRPremix"): ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC", "2022_Summer22"),
         ("HTo2LongLivedTo4b", "22EEDR"):     ("Summer22EE_22Sep2023_V3_MC", "Summer22EE_22Sep2023_JRV1_MC", "2022_Summer22EE"),
         ("HTo2LongLivedTo4b", "23BPix"):     ("Summer23BPixPrompt23_V3_MC", "Summer23BPixPrompt23_RunD_JRV1_MC", "2023_Summer23BPix"),
+        ("WJetsToLNu", "preEE"):         ("Summer22_22Sep2023_V3_MC", "Summer22_22Sep2023_JRV1_MC", "2022_Summer22"),
+        ("WJetsToLNu", "postEE"):        ("Summer22EE_22Sep2023_V3_MC", "Summer22EE_22Sep2023_JRV1_MC", "2022_Summer22EE") 
     }
 
 tag_name         = None
@@ -176,6 +181,9 @@ if options.isData:
 else:
     if "23BPix" in era_name:        era_name = "2023postBPix"
     elif "2023Prompt_" in era_name: era_name = "2023preBPix"
+    elif "postBPix" in era_name:        era_name = "2023postBPix"
+    elif "postEE" in era_name:      era_name = "2022postEE"
+    elif "preEE" in era_name:       era_name = "2022preEE"
     elif "2022EE" in era_name:      era_name = "2022postEE"
     elif "2022_" in era_name:       era_name = "2022preEE"
     elif "22DRPremix" in era_name:       era_name = "2022preEE"

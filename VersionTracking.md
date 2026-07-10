@@ -86,3 +86,13 @@ Location of ntuples:
 Still on the to-do list:
 * MET filters added
 * Prescale for HLT paths added
+
+## V5
+PassEventPreselection now includes the PassHLT requirement
+weights contain MC weights and event_weights contain trigger SF values correctly added
+
+Location of ntuples:
+```
+/eos/cms/store/group/phys_exotica/HCAL_LLP/MiniTuples/v5.1.1/ /eos/cms/store/group/phys_exotica/HCAL_LLP/MiniTuples/v5.2
+```
+
