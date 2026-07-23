@@ -465,7 +465,7 @@ void DisplacedHcalJetNTuplizer::EnableBranches(){
 	EnableEcalRechitBranches();
 	EnableHcalRechitBranches();
 	// MC
-	//EnablePileupBranches();
+	EnablePileupBranches();
 	//EnableMCBranches();
 	EnableGenParticleBranches();
 
@@ -954,8 +954,8 @@ void DisplacedHcalJetNTuplizer::EnableHcalRechitBranches(){
 // ------------------------------------------------------------------------------------
 void DisplacedHcalJetNTuplizer::EnablePileupBranches(){
 
-		output_tree->Branch( "n_BunchXing", &n_BunchXing );
-		output_tree->Branch( "BunchXing", &BunchXing );
+	output_tree->Branch( "n_BunchXing", &n_BunchXing );
+	output_tree->Branch( "BunchXing", &BunchXing );
 	output_tree->Branch( "nPU", &nPU );
 	output_tree->Branch( "nPUmean", &nPUmean );
 
@@ -1533,8 +1533,8 @@ void DisplacedHcalJetNTuplizer::ResetHcalRechitBranches(){
 // ------------------------------------------------------------------------------------
 void DisplacedHcalJetNTuplizer::ResetPileupBranches(){
 
-		n_BunchXing = 0;
-		BunchXing.clear();
+	n_BunchXing = 0;
+	BunchXing.clear();
 	nPU.clear();
 	nPUmean.clear();
 
@@ -1751,7 +1751,7 @@ void DisplacedHcalJetNTuplizer::analyze(const edm::Event& iEvent, const edm::Eve
 
 	// MC
 	if( !isData ){
-		//FillPileupBranches();
+		FillPileupBranches();
 		//FillMCBranches( iEvent, iSetup );
 		FillGenParticleBranches();
 	}

@@ -260,11 +260,11 @@ process.TFileService = cms.Service( "TFileService",
 # ----- Process Options ----- #
 
 process.options = cms.untracked.PSet(
-    #FailPath = cms.untracked.vstring(), #here
+    FailPath = cms.untracked.vstring(), #remove for higher global tags for 2025
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
-    #SkipEvent = cms.untracked.vstring(), #here
-    TryToContinue = cms.untracked.vstring("ProductNotFound"),
+    SkipEvent = cms.untracked.vstring(), #remove for higher global tags for 2025
+#    TryToContinue = cms.untracked.vstring("ProductNotFound"), #For 2025
     accelerators = cms.untracked.vstring('*'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
@@ -592,7 +592,7 @@ process.patMETs.genMETSource        = ''
 from CondCore.CondDB.CondDB_cfi import CondDB
 
 # ---------- JEC -----------
-JEC_file_path = 'sqlite_file:JEC_JER/JECDatabase/SLiteFiles/' + tag_name + '.db'
+JEC_file_path = 'sqlite_file:JEC_JER/JECDatabase/SQLiteFiles/' + tag_name + '.db'
 if options.tagJEC == "": # this is if processing locally, since with CRAB tagJEC is filled
     JEC_file_path = 'sqlite_file:../data/JEC_JER/JECDatabase/SQLiteFiles/' + tag_name + '.db'
 CondDBJECFile = CondDB.clone(connect = cms.string(JEC_file_path))
