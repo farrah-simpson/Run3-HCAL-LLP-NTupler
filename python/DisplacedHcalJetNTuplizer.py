@@ -19,14 +19,14 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing()
 
 options.register('isData',
-    False, # default value # isData wrapper
+    True, # default value # isData wrapper
     VarParsing.VarParsing.multiplicity.singleton,
     VarParsing.VarParsing.varType.bool,
     "is Data"
 )
 
 options.register('isSignal',
-    True, # default value # isSignal wrapper
+    False, # default value # isSignal wrapper
     VarParsing.VarParsing.multiplicity.singleton,
     VarParsing.VarParsing.varType.bool,
     "is Signal"

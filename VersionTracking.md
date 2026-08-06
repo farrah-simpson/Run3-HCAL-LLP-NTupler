@@ -87,12 +87,16 @@ Still on the to-do list:
 * MET filters added
 * Prescale for HLT paths added
 
-## V5
-PassEventPreselection now includes the PassHLT requirement
-weights contain MC weights and event_weights contain trigger SF values correctly added
+## V6
+New trigger SFs calculated using the correct monitoring path HLT_L1SingleLLP and QCD MC samples
 
 Location of ntuples:
 ```
-/eos/cms/store/group/phys_exotica/HCAL_LLP/MiniTuples/v5.1.1/ /eos/cms/store/group/phys_exotica/HCAL_LLP/MiniTuples/v5.2
+/hdfs/store/user/fsimpson/HToSSTo4B_MH125_MS50_CTau3000/HToSSTo4B_MH125_MS50_CTau3000_batch1_v6/260721_214728/0000/
+/hdfs/store/user/fsimpson/HToSSTo4B_MH125_MS50_CTau3000/HToSSTo4B_MH125_MS50_CTau3000_batch2_v6/260722_172821/0000/
+/hdfs/store/user/fsimpson/HToSSTo4B_MH250_MS120_CTau10000/HToSSTo4B_MH250_MS120_CTau10000_batch1_v6/260722_173023/0000/
+/hdfs/store/user/fsimpson/HToSSTo4B_MH250_MS120_CTau10000/HToSSTo4B_MH250_MS120_CTau10000_batch2_v6/260722_173141/0000/
+/hdfs/store/user/fsimpson/HToSSTo4B_MH350_MS160_CTau10000/HToSSTo4B_MH350_MS160_CTau10000_batch1_v6/260722_173418/0000/
+/hdfs/store/user/fsimpson/HToSSTo4B_MH350_MS160_CTau10000/HToSSTo4B_MH350_MS160_CTau10000_batch2_v6/260722_173537/0000/
+/hdfs/store/user/fsimpson/HToSSTo4B_MH350_MS80_CTau500/HToSSTo4B_MH350_MS80_CTau500_batch1_v6/260722_173301/0000/
 ```
-
