@@ -2209,11 +2209,11 @@ bool DisplacedHcalJetNTuplizer::applySF(bool isTagged, double eData, double eQCD
 
     if (eData < eQCD) {
         double SF = eData / eQCD;
-        if (isTagged && coin < SF) newTag = false;   // demote w/ prob (1-SF)
+        if (isTagged && coin >= SF) newTag = false;   // demote w/ prob (1-SF)
         // untagged jets: unchanged
     } else {
         double SFprime = (1.0 - eData) / (1.0 - eQCD);
-        if (!isTagged && coin < SFprime) newTag = true;  // promote w/ prob (1-SF')
+        if (!isTagged && coin >= SFprime) newTag = true;  // promote w/ prob (1-SF')
         // tagged jets: unchanged
     }
 
