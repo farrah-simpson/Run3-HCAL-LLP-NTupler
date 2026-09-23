@@ -2204,8 +2204,7 @@ bool DisplacedHcalJetNTuplizer::applySF(bool isTagged, double eData, double eQCD
     bool newTag = isTagged;
     if (eData == eQCD) return newTag;  // no correction needed
 
-    TRandom3 coin_rng(lumiNumber * 100005u + (UInt_t)eventNumber);
-    double coin = coin_rng.Uniform(1.0);
+    double coin = rand_.Uniform(1.0);
 
     if (eData < eQCD) {
         double SF = eData / eQCD;
