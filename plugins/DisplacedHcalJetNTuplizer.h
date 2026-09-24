@@ -179,6 +179,7 @@ using namespace std;
 //LOCAL includes
 //#include "cms_lpc_llp/llp_ntupler/interface/GetTrackTrajInfo.h"
 //#include "cms_lpc_llp/llp_ntupler/interface/RazorPDFWeightsHelper.h"
+#include "cms_lpc_llp/Run3-HCAL-LLP-NTupler/interface/TriggerSFTables.h"
 
 // ------ Class declaration ------ //
 
@@ -276,7 +277,7 @@ public:
 
 	double deltaPhi(double phi1, double phi2);
 	double deltaR(double eta1, double phi1, double eta2, double phi2);
-	pair<double,double> GetEfficiencies(double binValue, const string& filename);
+	std::pair<double,double> GetEfficiencies(double binValue, const double* binEdges, const double* dataVals, const double* mcVals, int nBins);
 	double ComputeTagSF(double eData, double eQCD);
 	bool applySF(bool isTagged, double eData, double eQCD);
 	float getBTagSF(const unique_ptr<correction::CorrectionSet> &cset, map<string, correction::Variable::Type> &jet_properties, const string &key,  const string &wp, const string &syst );
