@@ -1954,16 +1954,16 @@ bool DisplacedHcalJetNTuplizer::FillTriggerBranches(const edm::Event& iEvent, co
 	}
 
 	// ------ Trigger SF jet-by-jet update -------- //
+	// may move to FillJetBranches if we continue to save over all jets
 
 	for (int i = 0; i < (int)jetsCorr->size(); i++) {
+	    if( (*jetsCorr)[i].pt() < 20 || fabs((*jetsCorr)[i].eta()) > 2.0 ) continue;  // match FillJetBranches' cut
 	
 	    float pT_i  = (*jetsCorr)[i].pt();
 	    float eta_i = (*jetsCorr)[i].eta();
 
 	    int nPromptTracks_i;
 	    int nDisplacedTracks_i;
-
-	    if (pT_i < 40.0 || fabsf(eta_i) > 2.0) continue; //ensure these are the requirements used in the analysis to select leading and subleading jets
 
 	    if ((int)jet_NPromptTracks.size() > i) {
 	        nPromptTracks_i = jet_NPromptTracks[i];
