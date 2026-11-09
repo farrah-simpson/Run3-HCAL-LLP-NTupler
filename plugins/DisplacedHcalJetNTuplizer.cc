@@ -3,7 +3,7 @@
 /*
 	Description: Base class for miniAOD analysis with CRAB
 */
-//   Author:  CristiÃ¡n PeÃ±a and Si Xie; adapted for HCAL LLP Analysis by Kiley Kennedy and Gillian Kopp
+//   Author:  Cristián Peña and Si Xie; adapted for HCAL LLP Analysis by Kiley Kennedy and Gillian Kopp
 //   Created:  Thu, 26 March 2019 15:00:06 GMT
 
 #include "DisplacedHcalJetNTuplizer.h"
@@ -90,7 +90,6 @@ DisplacedHcalJetNTuplizer::DisplacedHcalJetNTuplizer(const edm::ParameterSet& iC
 	photon_cutbasedID_decisions_loose_Token_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("photon_cutbasedID_decisions_loose"))),
 	photon_cutbasedID_decisions_medium_Token_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("photon_cutbasedID_decisions_medium"))),
 	photon_cutbasedID_decisions_tight_Token_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("photon_cutbasedID_decisions_tight"))),
-
 	// MC
 	genParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
 	puInfoToken_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("puInfo"))),
@@ -852,6 +851,24 @@ void DisplacedHcalJetNTuplizer::EnableJetBranches(){
 	output_tree->Branch("jet_HLTStatus_HLT2",  &jet_HLTStatus_HLT2);
 	output_tree->Branch("jet_HLTStatus_HLT3a", &jet_HLTStatus_HLT3a);
 	output_tree->Branch("jet_HLTStatus_HLT3b", &jet_HLTStatus_HLT3b);
+	output_tree->Branch("jet_Tagged_L1",           &jet_Tagged_L1);
+	output_tree->Branch("jet_Tagged_Varied_L1",    &jet_Tagged_Varied_L1);
+	output_tree->Branch("jet_SF_L1",               &jet_SF_L1);
+	output_tree->Branch("jet_Tagged_HLT1a",        &jet_Tagged_HLT1a);
+	output_tree->Branch("jet_Tagged_Varied_HLT1a", &jet_Tagged_Varied_HLT1a);
+	output_tree->Branch("jet_SF_HLT1a",            &jet_SF_HLT1a);
+	output_tree->Branch("jet_Tagged_HLT1b",        &jet_Tagged_HLT1b);
+	output_tree->Branch("jet_Tagged_Varied_HLT1b", &jet_Tagged_Varied_HLT1b);
+	output_tree->Branch("jet_SF_HLT1b",            &jet_SF_HLT1b);
+	output_tree->Branch("jet_Tagged_HLT2",         &jet_Tagged_HLT2);
+	output_tree->Branch("jet_Tagged_Varied_HLT2",  &jet_Tagged_Varied_HLT2);
+	output_tree->Branch("jet_SF_HLT2",             &jet_SF_HLT2);
+	output_tree->Branch("jet_Tagged_HLT3a",        &jet_Tagged_HLT3a);
+	output_tree->Branch("jet_Tagged_Varied_HLT3a", &jet_Tagged_Varied_HLT3a);
+	output_tree->Branch("jet_SF_HLT3a",            &jet_SF_HLT3a);
+	output_tree->Branch("jet_Tagged_HLT3b",        &jet_Tagged_HLT3b);
+	output_tree->Branch("jet_Tagged_Varied_HLT3b", &jet_Tagged_Varied_HLT3b);
+	output_tree->Branch("jet_SF_HLT3b",            &jet_SF_HLT3b);
 
 	};
 
@@ -1746,7 +1763,7 @@ void DisplacedHcalJetNTuplizer::EnableJetBranches(){
 
 		if( debug ) cout<<"Done DisplacedHcalJetNTuplizer::beginRun"<<endl; 
 
-	}
+	};
 
 	// ------------------------------------------------------------------------------------
 	void DisplacedHcalJetNTuplizer::beginLuminosityBlock(edm::LuminosityBlock const& iLumi, edm::EventSetup const& iSetup) {
@@ -2101,7 +2118,7 @@ void DisplacedHcalJetNTuplizer::EvalHLTLeg(const std::string& key, int k, float 
 	}
 	const bool pass = (st >= 0) ? (st == 1) : emulated;
 
-	float w = 1.f;
+	float w = 1.;
 	if (isData_) {
 		cumNom = cumNom && pass;
 		cumVar = cumNom;
@@ -2992,22 +3009,23 @@ bool DisplacedHcalJetNTuplizer::FillJetBranches( const edm::Event& iEvent, const
 
 		// ------ Trigger SF jet-by-jet update -------- //
 	
-		const float pT_i  = jet.pt();  
+		const float pT_i  = jet_Pt.back(); 
 		const float eta_i = jet.eta();
 		const float phi_i = jet.phi();
-		const int nPromptTracks_i    = jet_NPromptTracks;
-		const int nDisplacedTracks_i = jet_NDisplacedTracks;
+		const int nPromptTracks_i    = nPtrk_1000;
+		const int nDisplacedTracks_i = nDtrk_500;
 		
 		// ---- L1 ---- //
 
-		float l1Pt = -1
+		float l1Pt = -1.;
 		int   l1Qual = -1;
 		int   l1Status = -1;
 
 		if (l1jets.isValid()) {
+		    float bestDR = 0.4;
 	    	    for (auto it = l1jets->begin(0); it != l1jets->end(0); ++it) {
 	    	        float dr = deltaR(eta_i, phi_i, it->eta(), it->phi());
-	    	        if (dr < 0.4) { bestDR = dr; l1Pt = it->pt(); l1Qual = it->hwQual(); }
+	    	        if (dr < bestDR) { bestDR = dr; l1Pt = it->pt(); l1Qual = it->hwQual(); }
 	    	    }
 	    	    l1Status = (l1Pt >= 60 && (l1Qual & 0x2)) ? 1 : 0;
 	    	}
@@ -3034,8 +3052,6 @@ bool DisplacedHcalJetNTuplizer::FillJetBranches( const edm::Event& iEvent, const
 	    	bool  tag_L1_pT_varied = tag_L1_pT;
 	    	float SF_L1            = 1.0;
 
-	    	bool  tag_L1_pT_varied = tag_L1_pT;
-	    	float SF_L1            = 1.0;
 	    	if (!isData_) {
 	    	    double eData_L1 = 0.64;
 	    	    double eQCD_L1  = (pT_i < 100) ? 0.55 : 0.60;
@@ -3105,7 +3121,7 @@ bool DisplacedHcalJetNTuplizer::FillJetBranches( const edm::Event& iEvent, const
 		if (debug) {
 		    const auto& s = jet_HLTStatus_HLT3a.back();
 		    const auto& v = jet_Tagged_Varied_HLT3a.back();
-		    cout << "[Trigger SF] jet " << ij << " pT=" << pT_i
+		    cout << "[Trigger SF] jet " << n_jet - 1  << " pT=" << pT_i
 		         << " nPrompt=" << nPromptTracks_i << " nDisp=" << nDisplacedTracks_i
 		         << " | HLT3a status " << s[0] << "/" << s[1] << "/" << s[2]
 		         << " varied " << v[0] << "/" << v[1] << "/" << v[2] << endl;
