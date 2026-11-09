@@ -979,6 +979,7 @@ protected:
 	vector<float> track_chi2;
 	vector<int>   track_ndof;
 	vector<int>   track_index;
+	vector<bool> track_PassQuality;
 
 	// ------ Secondary Vertices ------ //
 

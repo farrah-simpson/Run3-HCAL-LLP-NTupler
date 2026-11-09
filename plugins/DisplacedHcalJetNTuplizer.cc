@@ -880,6 +880,7 @@ void DisplacedHcalJetNTuplizer::EnableJetBranches(){
 		output_tree->Branch( "track_Eta", &track_Eta );
 		output_tree->Branch( "track_Phi", &track_Phi );
 		output_tree->Branch( "track_Charge", &track_Charge ); 
+		output_tree->Branch( "track_PassQuality", &track_PassQuality );
 		output_tree->Branch( "track_bestVertexIndex", &track_bestVertexIndex );
 		output_tree->Branch( "track_nMissingInnerHits", &track_nMissingInnerHits );
 		output_tree->Branch( "track_nMissingOuterHits", &track_nMissingOuterHits );
@@ -1494,6 +1495,7 @@ void DisplacedHcalJetNTuplizer::EnableJetBranches(){
 		track_Eta.clear();
 		track_Phi.clear();
 		track_Charge.clear();
+		track_PassQuality.clear();
 		track_bestVertexIndex.clear();
 		track_nMissingInnerHits.clear();
 		track_nMissingOuterHits.clear();
@@ -2924,11 +2926,13 @@ bool DisplacedHcalJetNTuplizer::FillJetBranches( const edm::Event& iEvent, const
 			reco::Track generalTrack = generalTracks->at(it);
 
 			// DR
-			if( deltaR( jet.eta(), jet.phi(), generalTrack.eta(), generalTrack.phi()) > 0.5 ) continue;
+			if( deltaR( jet.eta(), jet.phi(), generalTrack.eta(), generalTrack.phi()) > 0.4 ) continue;
 			// Energy 
 			if( generalTrack.pt() < 1.0 ) continue;
 
 			jet_TrackIndices_temp.push_back( it );
+
+			if( !generalTrack.quality(reco::TrackBase::highPurity) ) continue;
 
 			reco::TransientTrack t_trk = (*theB).build(generalTrack);
 			Measurement1D ip2d = IPTools::absoluteTransverseImpactParameter(t_trk, *PV_global).second;
@@ -3407,6 +3411,8 @@ bool DisplacedHcalJetNTuplizer::FillTrackBranches( const edm::Event& iEvent ){
 		track_Phi.push_back( track.phi() );
 		
 		track_Charge.push_back( track.charge() );
+
+		track_PassQuality.push_back( track.quality(reco::TrackBase::highPurity) );
 
 		// Find the best vertex for this track
 		float maxWeight = 0;
