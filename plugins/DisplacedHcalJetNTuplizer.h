@@ -284,7 +284,8 @@ public:
 	double deltaR(double eta1, double phi1, double eta2, double phi2);
 
 	void UnpackTriggerObjects(const edm::Event& iEvent);
-	bool MatchesHLTFilter(float eta, float phi, const std::string& label);
+	void MatchLeg0Objects();
+	bool HasHLTCounterpart(int objIdx, const std::string& label);
 	void EvalHLTLeg(const std::string& key, int k, float eta, float phi,
                 bool emulated, double x,
                 const double* bins, const double* dataVals, const double* mcVals, int nBins,
@@ -294,13 +295,6 @@ public:
 	pair<double,double> GetEfficiencies(double binValue, const double* binEdges, const double* dataVals, const double* mcVals, int nBins);
 	double ComputeTagSF(bool tagged, double eData, double eQCD);
 	bool applySF(bool isTagged, double eData, double eQCD);
-
-	// ----- HLT jet-leg matching (all keyed by "HLT1a", "HLT1b", ...) ----- //
-	map<string, string>              hltPathName_;
-	map<string, int>                      hltPathNLegs_;
-	map<string, int>                      hltPathIdx_;        // resolved per run (-1 = not in menu)
-	map<string, vector<string>> hltPathFilters_;
-	map<string, vector<int>>         hltPathModuleIdx_;
 
 	float getBTagSF(const unique_ptr<correction::CorrectionSet> &cset, map<string, correction::Variable::Type> &jet_properties, const string &key,  const string &wp, const string &syst );
 
@@ -446,6 +440,15 @@ protected:
 	// Mapping of the HLT Triggers and Filters
 	vector<string> triggerPathNames;
 	map<string, int> triggerPathNamesIndices;
+	map<std::string, std::vector<int>> hltLeg0Match_;
+
+	// ----- HLT jet-leg matching (all keyed by "HLT1a", "HLT1b", ...) ----- //
+	map<string, string>              hltPathName_;
+	map<string, int>                      hltPathNLegs_;
+	map<string, int>                      hltPathIdx_;        // resolved per run (-1 = not in menu)
+	map<string, vector<string>> hltPathFilters_;
+	map<string, vector<int>>         hltPathModuleIdx_;
+
 
 	// L1 trigger names and utility
 	l1t::L1TGlobalUtil l1GtUtils_;
